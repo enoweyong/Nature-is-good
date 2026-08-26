@@ -15,7 +15,7 @@ export const handler = async (event: any) => {
     if (!category || !id) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({ error: 'Category and ID are required' }),
       };
     }
@@ -35,14 +35,14 @@ export const handler = async (event: any) => {
     
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify(response.Attributes),
     };
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ error: 'Internal server error' }),
     };
   }

@@ -2,13 +2,12 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import * as S3origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as cloudfrontOrigins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 
 export class NatureGalleryCdkStack extends cdk.Stack {
@@ -27,7 +26,9 @@ export class NatureGalleryCdkStack extends cdk.Stack {
 
     const distribution = new cloudfront.Distribution(this, 'NatureGalleryDistribution', {
       defaultBehavior: {
-        origin: new S3origins.S3Origin(bucket, { originAccessIdentity }),
+        origin: cloudfrontOrigins.S3BucketOrigin.withOriginAccessIdentity(bucket, {
+          originAccessIdentity,
+        }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         compress: true,
       },
@@ -62,6 +63,8 @@ export class NatureGalleryCdkStack extends cdk.Stack {
       architecture: lambda.Architecture.ARM_64,
       environment: {
         TABLE_NAME: imagesTable.tableName,
+        BUCKET_NAME: bucket.bucketName,
+        CLOUDFRONT_DOMAIN: distribution.domainName,
       },
       bundling: {
         minify: true,
@@ -72,28 +75,34 @@ export class NatureGalleryCdkStack extends cdk.Stack {
     // Get all images by category
     const getImagesLambda = new nodejs.NodejsFunction(this, 'GetImagesLambda', {
       ...commonLambdaProps,
-      entry: path.join(__dirname, '../lambda/get-images.ts'),
+      entry: path.join(process.cwd(), 'lambda/get-images.ts'),
       handler: 'handler',
     });
 
     // Add/Upload image
     const addImageLambda = new nodejs.NodejsFunction(this, 'AddImageLambda', {
       ...commonLambdaProps,
-      entry: path.join(__dirname, '../lambda/add-image.ts'),
+      entry: path.join(process.cwd(), 'lambda/add-image.ts'),
       handler: 'handler',
     });
 
     // Delete image
     const deleteImageLambda = new nodejs.NodejsFunction(this, 'DeleteImageLambda', {
       ...commonLambdaProps,
-      entry: path.join(__dirname, '../lambda/delete-image.ts'),
+      entry: path.join(process.cwd(), 'lambda/delete-image.ts'),
       handler: 'handler',
     });
 
     // Update likes
     const updateLikesLambda = new nodejs.NodejsFunction(this, 'UpdateLikesLambda', {
       ...commonLambdaProps,
-      entry: path.join(__dirname, '../lambda/update-likes.ts'),
+      entry: path.join(process.cwd(), 'lambda/update-likes.ts'),
+      handler: 'handler',
+    });
+
+    const editImageLambda = new nodejs.NodejsFunction(this, 'EditImageLambda', {
+      ...commonLambdaProps,
+      entry: path.join(process.cwd(), 'lambda/edit-image.ts'),
       handler: 'handler',
     });
 
@@ -102,6 +111,8 @@ export class NatureGalleryCdkStack extends cdk.Stack {
     imagesTable.grantWriteData(addImageLambda);
     imagesTable.grantWriteData(deleteImageLambda);
     imagesTable.grantWriteData(updateLikesLambda);
+    imagesTable.grantWriteData(editImageLambda);
+    bucket.grantPut(addImageLambda);
 
     // ─── 4. API GATEWAY ───
     const api = new apigateway.RestApi(this, 'NatureGalleryAPI', {
@@ -130,6 +141,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
     // PUT /images/{category}/{id}/like
     const likeResource = imageResource.addResource('like');
     likeResource.addMethod('PUT', new apigateway.LambdaIntegration(updateLikesLambda));
+    imageResource.addMethod('PUT', new apigateway.LambdaIntegration(editImageLambda));
 
     // ─── 5. DEPLOY WEBSITE ───
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {

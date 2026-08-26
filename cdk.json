@@ -1,5 +1,5 @@
 {
-  "app": "npx tsc && npx tsx bin/nature-gallery-cdk.ts",
+  "app": "npx tsc --noEmit false --outDir .cdk-build && node .cdk-build/bin/nature-gallery-cdk.js",
   "watch": {
     "include": [
       "**"
