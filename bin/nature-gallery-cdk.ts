@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import * as cdk from 'aws-cdk-lib/core';
+import * as cdk from 'aws-cdk-lib';
 import { NatureGalleryCdkStack } from '../lib/nature-gallery-cdk-stack';
 
 const app = new cdk.App();
