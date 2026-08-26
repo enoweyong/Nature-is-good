@@ -12,11 +12,15 @@ const CLOUDFRONT_DOMAIN = process.env.CLOUDFRONT_DOMAIN!;
 export const handler = async (event: any) => {
   try {
     const body = typeof event.body === 'string' ? JSON.parse(event.body || '{}') : (event.body || {});
-    const { category, title, sub, desc, type, imageUrl, imageData, contentType } = body;
+    const { category, title, sub, desc, type, imageUrl, mediaUrl, mediaType, imageData, contentType } = body;
     const id = body.id || randomUUID();
     if (!category || !title || !desc) return response(400, { error: 'Category, title, and description are required' });
 
-    let storedImageUrl = imageUrl || '';
+    let storedImageUrl = mediaUrl || imageUrl || '';
+    const storedMediaType = mediaType === 'video' ? 'video' : 'image';
+    if (storedImageUrl && !/^https?:\/\//i.test(storedImageUrl)) {
+      return response(400, { error: 'mediaUrl must be a public http or https URL' });
+    }
     if (imageData) {
       const match = String(imageData).match(/^data:([^;]+);base64,(.+)$/);
       if (!match) return response(400, { error: 'imageData must be a base64 data URL' });
@@ -40,6 +44,8 @@ export const handler = async (event: any) => {
       likes: 0,
       views: 0,
       imageUrl: storedImageUrl,
+      mediaUrl: storedImageUrl,
+      mediaType: imageData ? (contentType || '').startsWith('video/') ? 'video' : 'image' : storedMediaType,
       createdAt: new Date().toISOString(),
     };
     await docClient.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
