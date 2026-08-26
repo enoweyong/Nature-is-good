@@ -1,14 +1,14 @@
 import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as S3origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { Construct } from 'constructs';
 import * as path from 'path';
 
 export class NatureGalleryCdkStack extends cdk.Stack {
@@ -27,7 +27,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
 
     const distribution = new cloudfront.Distribution(this, 'NatureGalleryDistribution', {
       defaultBehavior: {
-        origin: new origins.S3Origin(bucket, { originAccessIdentity }),
+        origin: new S3origins.S3Origin(bucket, { originAccessIdentity }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         compress: true,
       },
@@ -133,7 +133,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
 
     // ─── 5. DEPLOY WEBSITE ───
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
-      sources: [s3deploy.Source.asset('./')],
+      sources: [s3deploy.Source.asset('./website')],
       destinationBucket: bucket,
       distribution,
       distributionPaths: ['/*'],
