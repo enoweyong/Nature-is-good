@@ -66,7 +66,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
         BUCKET_NAME: bucket.bucketName,
         CLOUDFRONT_DOMAIN: distribution.domainName,
       },
-      bundling: {
+      bundling: { //bundling options for NodejsFunction
         minify: true,
         sourceMap: false,
       },
@@ -100,6 +100,12 @@ export class NatureGalleryCdkStack extends cdk.Stack {
       handler: 'handler',
     });
 
+    const updateViewsLambda = new nodejs.NodejsFunction(this, 'UpdateViewsLambda', {
+      ...commonLambdaProps,
+      entry: path.join(process.cwd(), 'lambda/update-views.ts'),
+      handler: 'handler',
+    });
+
     const editImageLambda = new nodejs.NodejsFunction(this, 'EditImageLambda', {
       ...commonLambdaProps,
       entry: path.join(process.cwd(), 'lambda/edit-image.ts'),
@@ -111,6 +117,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
     imagesTable.grantWriteData(addImageLambda);
     imagesTable.grantWriteData(deleteImageLambda);
     imagesTable.grantWriteData(updateLikesLambda);
+    imagesTable.grantWriteData(updateViewsLambda);
     imagesTable.grantWriteData(editImageLambda);
     bucket.grantPut(addImageLambda);
 
@@ -141,6 +148,8 @@ export class NatureGalleryCdkStack extends cdk.Stack {
     // PUT /images/{category}/{id}/like
     const likeResource = imageResource.addResource('like');
     likeResource.addMethod('PUT', new apigateway.LambdaIntegration(updateLikesLambda));
+    const viewResource = imageResource.addResource('view');
+    viewResource.addMethod('PUT', new apigateway.LambdaIntegration(updateViewsLambda));
     imageResource.addMethod('PUT', new apigateway.LambdaIntegration(editImageLambda));
 
     // ─── 5. DEPLOY WEBSITE ───
