@@ -1,4 +1,4 @@
-﻿import * as cdk from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
@@ -33,13 +33,9 @@ export class NatureGalleryCdkStack extends cdk.Stack {
         compress: true,
       },
       defaultRootObject: 'index.html',
-      errorResponses: [
-        {
-          httpStatus: 404,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-        },
-      ],
+      // NOTE: no SPA 404->index.html rewrite. Returning index.html (HTTP 200,
+      // Content-Type text/html) for missing objects makes image URLs resolve
+      // to HTML, which browsers block with ERR_BLOCKED_BY_ORB.
     });
 
     // â”€â”€â”€ 2. DYNAMODB TABLE â”€â”€â”€
