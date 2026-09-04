@@ -1406,7 +1406,7 @@
 
         } 
 
-        .upload-area.dragover { 
+        .upload-area.dragging, .upload-area.dragover {
 
             border-color: var(--accent); 
 
@@ -1476,7 +1476,7 @@
 
         } 
 
-        .upload-preview .preview-item img { 
+        .upload-preview .preview-item img, .upload-preview .preview-item video {
 
             width: 100%; 
 
@@ -1537,6 +1537,13 @@
             flex-wrap: wrap; 
 
         } 
+
+        .upload-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-top: 1.2rem; }
+        .upload-form input, .upload-form select { width: 100%; padding: 0.8rem 0.95rem; border: 1px solid rgba(44, 62, 80, 0.2); border-radius: 8px; background: var(--bg-primary); color: var(--text-main); font: inherit; }
+        .upload-form input:focus, .upload-form select:focus { outline: 2px solid var(--accent-glow); border-color: var(--accent); }
+        .upload-form input:nth-child(2), .upload-form input:nth-child(3) { grid-column: 1 / -1; }
+        .media-embed { width: 100%; height: 100%; border: 0; }
+        @media (max-width: 640px) { .upload-form { grid-template-columns: 1fr; } .upload-form input:nth-child(2), .upload-form input:nth-child(3) { grid-column: auto; } }
 
  
 
@@ -1933,7 +1940,7 @@
 
             <div class="upload-header"> 
 
-                <h2>📸 Share Your Nature Photos</h2> 
+                <h2>Share a moment from nature</h2>
 
                 <span style="font-size:0.85rem;color:var(--text-muted);">Add your own images to the gallery</span> 
 
@@ -1941,11 +1948,11 @@
 
             <div class="upload-area" id="uploadArea"> 
 
-                <div class="icon">🖼️</div> 
+                <div class="icon">＋</div>
 
                 <p><strong>Drag & drop</strong> your images here or click to browse</p> 
 
-                <p style="font-size:0.8rem;margin-top:0.2rem;">Supports images and short videos up to 8MB, or paste a public media URL</p>
+                <p style="font-size:0.8rem;margin-top:0.2rem;">Images and videos up to 8MB</p>
 
                 <input type="file" id="fileInput" accept="image/*,video/*" multiple />
 
@@ -1955,17 +1962,18 @@
 
             <div class="upload-preview" id="uploadPreview"></div> 
 
-            <div class="upload-actions"> 
-
-                <button class="btn btn-sm" id="confirmUpload" disabled>✅ Add to Gallery</button> 
-
-                <button class="btn btn-sm btn-outline" id="clearUpload">Clear All</button>
+            <div class="upload-form">
                 <input id="uploadTitle" type="text" placeholder="Title (optional)" maxlength="80">
-                <input id="uploadDescription" type="text" placeholder="Description" maxlength="240" required>
-                <input id="mediaUrl" type="url" placeholder="Or paste a public image/video URL" maxlength="2000">
-                <select id="mediaType" aria-label="Remote media type"><option value="image">Image link</option><option value="video">Video link</option></select>
+                <input id="uploadDescription" type="text" placeholder="Describe what viewers are seeing (required)" maxlength="240" required>
+                <input id="mediaUrl" type="url" placeholder="Paste a public image, video, YouTube, Vimeo, or embed URL" maxlength="2000">
+                <select id="mediaType" aria-label="URL media format">
+                    <option value="auto">Auto-detect link type</option>
+                    <option value="image">This link is an image</option>
+                    <option value="video">This link is a video</option>
+                    <option value="embed">This link is an embedded page</option>
+                </select>
 
-                <select id="uploadCategory" style="padding:0.4rem 1rem;border-radius:30px;border:2px solid var(--text-muted);background:var(--bg-card);color:var(--text-main);font-size:0.85rem;"> 
+                <select id="uploadCategory" aria-label="Gallery category">
 
                     <option value="animals">Animals</option> 
 
@@ -1974,8 +1982,14 @@
                     <option value="flowers">Flowers</option> 
 
                 </select> 
+                <select id="uploadType" aria-label="Nature type"></select>
 
-            </div> 
+            </div>
+            <p style="color:var(--text-muted);font-size:0.78rem;margin-top:0.35rem;">Public links are saved in the gallery. The host must allow embedding for an inline preview.</p>
+            <div class="upload-actions">
+                <button class="btn btn-sm" id="confirmUpload" disabled>＋ Add to Gallery</button>
+                <button class="btn btn-sm btn-outline" id="clearUpload">Clear</button>
+            </div>
 
         </section> 
 
@@ -2117,6 +2131,7 @@
                 <div style="margin-top:1.2rem;display:flex;gap:0.6rem;flex-wrap:wrap;"> 
 
                     <button class="btn btn-sm" id="modalLikeBtn">❤️ Like</button>
+                    <button class="btn btn-sm btn-outline" id="modalShareBtn">↗ Share</button>
                     <button class="btn btn-sm btn-outline" id="modalEditBtn">Edit</button>
 
                     <button class="btn btn-sm btn-outline" id="modalDeleteBtn">🗑️ Delete</button> 
@@ -2164,6 +2179,7 @@
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
     const uploadCategory = document.getElementById('uploadCategory');
+    const uploadType = document.getElementById('uploadType');
     const uploadTitle = document.getElementById('uploadTitle');
     const uploadDescription = document.getElementById('uploadDescription');
     const mediaUrl = document.getElementById('mediaUrl');
@@ -2171,6 +2187,16 @@
     const uploadPreview = document.getElementById('uploadPreview');
     const confirmUpload = document.getElementById('confirmUpload');
     let pendingUploads = [];
+
+    const categoryTypes = {
+        animals: [['mammal', 'Mammal'], ['bird', 'Bird'], ['reptile', 'Reptile'], ['aquatic', 'Aquatic']],
+        trees: [['evergreen', 'Evergreen'], ['deciduous', 'Deciduous'], ['tropical', 'Tropical'], ['fruit', 'Fruit']],
+        flowers: [['spring', 'Spring'], ['summer', 'Summer'], ['autumn', 'Autumn'], ['tropical-flower', 'Tropical flower']],
+    };
+
+    function updateUploadTypes() {
+        uploadType.innerHTML = categoryTypes[uploadCategory.value].map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
+    }
 
     function showToast(message, isError = false) {
         const toast = document.createElement('div');
@@ -2185,6 +2211,13 @@
     function escapeHtml(value = '') {
         return String(value).replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
     }
+    function mediaMarkup(item, title = '') {
+        const source = item.embedUrl || item.mediaUrl || item.imageUrl || '';
+        const type = item.mediaType || 'image';
+        if (type === 'video') return `<video src="${escapeHtml(source)}" muted loop playsinline preload="metadata"></video>`;
+        if (type === 'embed') return `<iframe class="media-embed" src="${escapeHtml(source)}" title="${escapeHtml(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        return `<img src="${escapeHtml(source)}" alt="${escapeHtml(title)}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false" /><a href="${escapeHtml(source)}" target="_blank" rel="noopener" hidden>Open original image</a>`;
+    }
     function allImages(category) { return state.images[category]; }
     function findImage(category, id) { return allImages(category).find(image => image.id === id); }
 
@@ -2195,9 +2228,17 @@
     }
 
     function setupNav() {
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', () => {
+            const isOpen = navLinks.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', String(isOpen));
+        });
         document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', () => {
             document.querySelectorAll('.nav-links a').forEach(item => item.classList.remove('active'));
             link.classList.add('active');
+            navLinks.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
         }));
     }
 
@@ -2214,8 +2255,13 @@
     }
 
     function renderUploadPreview() {
-        uploadPreview.innerHTML = pendingUploads.map(item => `<div class="preview-item"><img src="${item.preview}" alt=""><span>${escapeHtml(item.name)}</span></div>`).join('');
-        confirmUpload.disabled = pendingUploads.length === 0;
+        uploadPreview.innerHTML = pendingUploads.map(item => {
+            const preview = item.contentType.startsWith('video/')
+                ? `<video src="${escapeHtml(item.preview)}" muted controls playsinline></video>`
+                : `<img src="${escapeHtml(item.preview)}" alt="${escapeHtml(item.name)}">`;
+            return `<div class="preview-item">${preview}<span>${escapeHtml(item.name)}</span></div>`;
+        }).join('');
+        confirmUpload.disabled = pendingUploads.length === 0 && !mediaUrl.value.trim();
     }
 
     function readFile(file) {
@@ -2228,6 +2274,8 @@
     }
 
     function bindEvents() {
+        updateUploadTypes();
+        uploadCategory.addEventListener('change', updateUploadTypes);
         document.getElementById('themeToggle').addEventListener('click', () => {
             state.theme = state.theme === 'dark' ? 'light' : 'dark';
             localStorage.setItem('earthlens-theme', state.theme);
@@ -2244,11 +2292,21 @@
         uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragging'));
         uploadArea.addEventListener('drop', async event => { event.preventDefault(); uploadArea.classList.remove('dragging'); await addPendingFiles([...event.dataTransfer.files]); });
         fileInput.addEventListener('change', async event => { await addPendingFiles([...event.target.files]); fileInput.value = ''; });
-        document.getElementById('clearUpload').addEventListener('click', () => { pendingUploads.forEach(item => URL.revokeObjectURL(item.preview)); pendingUploads = []; renderUploadPreview(); });
+        mediaUrl.addEventListener('input', renderUploadPreview);
+        document.getElementById('clearUpload').addEventListener('click', () => {
+            pendingUploads.forEach(item => URL.revokeObjectURL(item.preview));
+            pendingUploads = [];
+            uploadTitle.value = '';
+            uploadDescription.value = '';
+            mediaUrl.value = '';
+            mediaType.value = 'auto';
+            renderUploadPreview();
+        });
         confirmUpload.addEventListener('click', confirmUploads);
         document.getElementById('modalClose').addEventListener('click', closeModal);
         document.getElementById('imageModal').addEventListener('click', event => { if (event.target.id === 'imageModal') closeModal(); });
         document.getElementById('modalLikeBtn').addEventListener('click', () => state.modalData && toggleLike(state.modalData.category, state.modalData.id));
+        document.getElementById('modalShareBtn').addEventListener('click', shareCurrentImage);
         document.getElementById('modalDeleteBtn').addEventListener('click', () => state.modalData && deleteImage(state.modalData.category, state.modalData.id));
         document.getElementById('modalEditBtn').addEventListener('click', () => { document.getElementById('editForm').hidden = false; });
         document.getElementById('editForm').addEventListener('submit', saveEdit);
@@ -2256,7 +2314,7 @@
 
     async function addPendingFiles(files) {
         const valid = files.filter(file => /^(image|video)\//.test(file.type) && file.size <= 8 * 1024 * 1024);
-        if (valid.length !== files.length) showToast('Only images up to 8MB can be added', true);
+        if (valid.length !== files.length) showToast('Only images or videos up to 8MB can be added', true);
         pendingUploads.push(...await Promise.all(valid.map(readFile)));
         renderUploadPreview();
     }
@@ -2264,25 +2322,25 @@
     function openModal(category, id) {
         const image = findImage(category, id);
         if (!image) return;
+        recordView(category, id);
         state.modalData = { category, id };
         const modalSource = image.mediaUrl || image.imageUrl || `https://picsum.photos/seed/${category}-${id}/800/600`;
         const mediaWrap = document.querySelector('#imageModal .modal-img-wrap');
-        const oldVideo = document.getElementById('modalVideo');
-        if (oldVideo) oldVideo.remove();
+        const oldMedia = document.getElementById('modalMedia');
+        if (oldMedia) oldMedia.remove();
         const modalImage = document.getElementById('modalImg');
-        if ((image.mediaType || 'image') === 'video') {
-            modalImage.hidden = true;
-            const video = document.createElement('video');
-            video.id = 'modalVideo';
-            video.src = modalSource;
-            video.controls = true;
-            video.autoplay = true;
-            video.playsInline = true;
-            mediaWrap.insertBefore(video, document.getElementById('modalClose'));
-        } else {
+        if ((image.mediaType || 'image') === 'image') {
             modalImage.hidden = false;
             modalImage.src = modalSource;
             modalImage.alt = image.title;
+        } else {
+            modalImage.hidden = true;
+            const media = document.createElement(image.mediaType === 'video' ? 'video' : 'iframe');
+            media.id = 'modalMedia';
+            media.src = image.embedUrl || modalSource;
+            if (image.mediaType === 'video') { media.controls = true; media.autoplay = true; media.playsInline = true; }
+            else { media.className = 'media-embed'; media.title = image.title; media.allowFullscreen = true; }
+            mediaWrap.insertBefore(media, document.getElementById('modalClose'));
         }
         document.getElementById('modalTitle').textContent = image.title;
         document.getElementById('modalSub').textContent = `${getCategoryLabel(category)} • ${getTypeLabel(image.type)}`;
@@ -2300,10 +2358,32 @@
 
     function closeModal() {
         document.getElementById('imageModal').classList.remove('active');
-        const video = document.getElementById('modalVideo');
-        if (video) video.remove();
+        const oldMedia = document.getElementById('modalMedia');
+        if (oldMedia) oldMedia.remove();
         document.getElementById('modalImg').hidden = false;
         state.modalData = null;
+    }
+
+    async function shareCurrentImage() {
+        if (!state.modalData) return;
+        const image = findImage(state.modalData.category, state.modalData.id);
+        if (!image) return;
+        const shareData = {
+            title: image.title || 'Nature Gallery image',
+            text: image.desc || 'View this nature image in EarthLens',
+            url: `${window.location.href.split('#')[0]}#${state.modalData.category}/${encodeURIComponent(state.modalData.id)}`,
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+                showToast('Image shared');
+                return;
+            }
+            await navigator.clipboard.writeText(shareData.url);
+            showToast('Share link copied to clipboard');
+        } catch (error) {
+            if (error.name !== 'AbortError') showToast('Unable to share this image', true);
+        }
     }
 
     // ─── API HELPERS ───
@@ -2362,6 +2442,46 @@
         } catch (error) {
             console.error('Error updating likes:', error);
             return null;
+        }
+    }
+
+    async function recordView(category, id) {
+        const viewKey = `earthlens-viewed-${category}-${id}`;
+        try {
+            if (sessionStorage.getItem(viewKey)) return;
+            sessionStorage.setItem(viewKey, '1');
+        } catch (error) {
+            console.warn('Could not access session storage; recording this view.', error);
+        }
+
+        const allImages = [...state.images[category], ...state.uploads[category]];
+        const image = allImages.find(item => item.id === id);
+        if (image) {
+            image.views = (image.views || 0) + 1;
+            document.getElementById('modalViews').textContent = image.views;
+            renderGallery(category);
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/${encodeURIComponent(category)}/${encodeURIComponent(id)}/view`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (!response.ok) throw new Error('Failed to record view');
+            const updated = await response.json();
+            if (image && typeof updated.views === 'number') {
+                image.views = updated.views;
+                document.getElementById('modalViews').textContent = image.views;
+                renderGallery(category);
+            }
+        } catch (error) {
+            console.error('Error recording view:', error);
+            if (image) {
+                image.views = Math.max(0, (image.views || 1) - 1);
+                document.getElementById('modalViews').textContent = image.views;
+                renderGallery(category);
+            }
+            try { sessionStorage.removeItem(viewKey); } catch { }
         }
     }
 
@@ -2448,9 +2568,9 @@
         }
         if (query) {
             filtered = filtered.filter(img =>
-                img.title.toLowerCase().includes(query) ||
-                img.sub.toLowerCase().includes(query) ||
-                img.desc.toLowerCase().includes(query)
+                String(img.title || '').toLowerCase().includes(query) ||
+                String(img.sub || '').toLowerCase().includes(query) ||
+                String(img.desc || '').toLowerCase().includes(query)
             );
         }
 
@@ -2470,12 +2590,9 @@
         container.innerHTML = filtered.map(img => {
             const isLiked = state.liked.has(`${category}-${img.id}`);
             const imageUrl = img.mediaUrl || img.imageUrl || `https://picsum.photos/seed/${category}-${img.id}/600/400`;
-            const mediaType = img.mediaType || 'image';
             const typeLabel = getTypeLabel(img.type);
             const catLabel = getCategoryLabel(category);
-            const media = mediaType === 'video'
-                ? `<video src="${escapeHtml(imageUrl)}" muted loop playsinline preload="metadata"></video>`
-                : `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(img.title)}" loading="lazy" />`;
+            const media = mediaMarkup(img, img.title);
 
             return `
                 <article class="nature-card" data-id="${img.id}" data-category="${category}">
@@ -2513,6 +2630,11 @@
                 const id = card.dataset.id;
                 const cat = card.dataset.category;
                 openModal(cat, id);
+            });
+            el.addEventListener('dblclick', function(e) {
+                if (e.target.closest('.card-actions-top')) return;
+                const card = this.closest('.nature-card');
+                openModal(card.dataset.category, card.dataset.id);
             });
         });
 
@@ -2552,6 +2674,11 @@
             state.liked.add(key);
             img.likes = (img.likes || 0) + 1;
         }
+
+        if (state.modalData && state.modalData.category === category && state.modalData.id === id) {
+            document.getElementById('modalLikes').textContent = img.likes;
+            document.getElementById('modalLikeBtn').textContent = state.liked.has(key) ? '❤️ Unlike' : '❤️ Like';
+        }
         
         renderGallery(category);
 
@@ -2560,6 +2687,9 @@
         if (result) {
             // Update with server value
             img.likes = result.likes;
+            if (state.modalData && state.modalData.category === category && state.modalData.id === id) {
+                document.getElementById('modalLikes').textContent = img.likes;
+            }
             renderGallery(category);
         }
     }
@@ -2606,8 +2736,15 @@
             showToast('Choose a file or paste a public image/video URL', true);
             return;
         }
+        if (remoteUrl) {
+            try { new URL(remoteUrl); } catch {
+                showToast('Enter a valid public media URL', true);
+                return;
+            }
+        }
         const category = uploadCategory.value;
-        const uploadItems = pendingUploads.length ? pendingUploads : [{ name: 'Linked media', data: '', contentType: '', remoteUrl }];
+        const uploadItems = [...pendingUploads];
+        if (remoteUrl) uploadItems.push({ name: 'Linked media', data: '', contentType: '', remoteUrl });
 
         for (const item of uploadItems) {
             const id = `upload-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
@@ -2618,9 +2755,9 @@
                 title: uploadTitle.value.trim() || title || 'My Photo',
                 sub: 'User Uploaded',
                 desc: uploadDescription.value.trim(),
-                type: 'user',
+                type: uploadType.value,
                 mediaUrl: item.remoteUrl,
-                mediaType: item.remoteUrl ? mediaType.value : undefined,
+                mediaType: item.remoteUrl && mediaType.value !== 'auto' ? mediaType.value : undefined,
                 imageData: item.data || undefined,
                 contentType: item.contentType,
             };
@@ -2636,6 +2773,7 @@
             }
         }
 
+        pendingUploads.forEach(item => URL.revokeObjectURL(item.preview));
         pendingUploads = [];
         renderUploadPreview();
         confirmUpload.disabled = true;
