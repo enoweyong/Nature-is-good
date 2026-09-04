@@ -1,4 +1,4 @@
-import * as cdk from 'aws-cdk-lib';
+﻿import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
@@ -14,7 +14,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // ─── 1. S3 BUCKET (Static Hosting) ───
+    // â”€â”€â”€ 1. S3 BUCKET (Static Hosting) â”€â”€â”€
     const bucket = new s3.Bucket(this, 'NatureGalleryBucket', {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -42,7 +42,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
       ],
     });
 
-    // ─── 2. DYNAMODB TABLE ───
+    // â”€â”€â”€ 2. DYNAMODB TABLE â”€â”€â”€
     const imagesTable = new dynamodb.Table(this, 'ImagesTable', {
       partitionKey: { name: 'category', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'id', type: dynamodb.AttributeType.STRING },
@@ -57,9 +57,9 @@ export class NatureGalleryCdkStack extends cdk.Stack {
       sortKey: { name: 'title', type: dynamodb.AttributeType.STRING },
     });
 
-    // ─── 3. LAMBDA FUNCTIONS ───
+    // â”€â”€â”€ 3. LAMBDA FUNCTIONS â”€â”€â”€
     const commonLambdaProps = {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       architecture: lambda.Architecture.ARM_64,
       environment: {
         TABLE_NAME: imagesTable.tableName,
@@ -121,7 +121,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
     imagesTable.grantWriteData(editImageLambda);
     bucket.grantPut(addImageLambda);
 
-    // ─── 4. API GATEWAY ───
+    // â”€â”€â”€ 4. API GATEWAY â”€â”€â”€
     const api = new apigateway.RestApi(this, 'NatureGalleryAPI', {
       restApiName: 'Nature Gallery API',
       description: 'API for nature gallery images',
@@ -152,7 +152,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
     viewResource.addMethod('PUT', new apigateway.LambdaIntegration(updateViewsLambda));
     imageResource.addMethod('PUT', new apigateway.LambdaIntegration(editImageLambda));
 
-    // ─── 5. DEPLOY WEBSITE ───
+    // â”€â”€â”€ 5. DEPLOY WEBSITE â”€â”€â”€
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
       sources: [s3deploy.Source.asset('./website')],
       destinationBucket: bucket,
@@ -160,7 +160,7 @@ export class NatureGalleryCdkStack extends cdk.Stack {
       distributionPaths: ['/*'],
     });
 
-    // ─── 6. OUTPUTS ───
+    // â”€â”€â”€ 6. OUTPUTS â”€â”€â”€
     new cdk.CfnOutput(this, 'CloudFrontURL', {
       value: distribution.domainName,
       description: 'The CloudFront distribution URL',

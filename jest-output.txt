@@ -1,0 +1,236 @@
+﻿node.exe : Bundling asset NatureGalleryCdkStack/GetImagesLambda/Code/Stage...
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\enowj\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Bundling asset ...a/Code/Stage...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+  ...8b2fa1ac68b33637dff2978a25d8b0a557afb8d650cace52-building\index.js  1.3kb
+
+Done in 7ms
+Bundling asset NatureGalleryCdkStack/AddImageLambda/Code/Stage...
+
+  ...460fd9b618b35e38abd284bd5d8fc77501c61be4bb3d2b7b-building\index.js  3.0kb
+
+Done in 7ms
+Bundling asset NatureGalleryCdkStack/DeleteImageLambda/Code/Stage...
+
+  ...1c66898de66d834cc84dafdb13d2ccbe063bdf651f58c9b8-building\index.js  1.3kb
+
+Done in 6ms
+Bundling asset NatureGalleryCdkStack/UpdateLikesLambda/Code/Stage...
+
+  ...a0004b68ad70c7d99f17ff768f73b679cf29b9409be1c83b-building\index.js  1.5kb
+
+Done in 7ms
+Bundling asset NatureGalleryCdkStack/UpdateViewsLambda/Code/Stage...
+
+  ...8573873bfa7fe4a635bb492aac22c06cba546de1a34451a0-building\index.js  1.3kb
+
+Done in 7ms
+Bundling asset NatureGalleryCdkStack/EditImageLambda/Code/Stage...
+
+  ...4f0ec515f7d0ea8511e0a21c97a1994bbe16d2e8dd0f2c03-building\index.js  1.5kb
+
+Done in 6ms
+  console.error
+    lib\nature-gallery-cdk-stack.ts:76:29
+    WARNING Runtime: Runtime 'nodejs18.x' was deprecated on '2025-09-01'. Creation was disabled on '2027-02-01' and update on '2027-03-03'. Please consider updating to 'nodejs24.x' (CloudFormation Validate)
+       NatureGalleryCdkStack/GetImagesLambda/Resource (GetImagesLambdaA876D4CB) aws-cdk-lib.aws_lambda.CfnFunction
+       Acknowledge with 'CloudFormation-Validate::W2531'
+    
+    lib\nature-gallery-cdk-stack.ts:83:28
+    WARNING Runtime: Runtime 'nodejs18.x' was deprecated on '2025-09-01'. Creation was disabled on '2027-02-01' and update on '2027-03-03'. Please consider updating to 'nodejs24.x' (CloudFormation Validate)
+       NatureGalleryCdkStack/AddImageLambda/Resource (AddImageLambda25C1D740) aws-cdk-lib.aws_lambda.CfnFunction
+       Acknowledge with 'CloudFormation-Validate::W2531'
+    
+    lib\nature-gallery-cdk-stack.ts:90:31
+    WARNING Runtime: Runtime 'nodejs18.x' was deprecated on '2025-09-01'. Creation was disabled on '2027-02-01' and update on '2027-03-03'. Please consider updating to 'nodejs24.x' (CloudFormation Validate)
+       NatureGalleryCdkStack/DeleteImageLambda/Resource (DeleteImageLambda4152DAA9) aws-cdk-lib.aws_lambda.CfnFunction
+       Acknowledge with 'CloudFormation-Validate::W2531'
+    
+    lib\nature-gallery-cdk-stack.ts:97:31
+    WARNING Runtime: Runtime 'nodejs18.x' was deprecated on '2025-09-01'. Creation was disabled on '2027-02-01' and update on '2027-03-03'. Please consider updating to 'nodejs24.x' (CloudFormation Validate)
+       NatureGalleryCdkStack/UpdateLikesLambda/Resource (UpdateLikesLambda7470E306) aws-cdk-lib.aws_lambda.CfnFunction
+       Acknowledge with 'CloudFormation-Validate::W2531'
+    
+    lib\nature-gallery-cdk-stack.ts:103:31
+    WARNING Runtime: Runtime 'nodejs18.x' was deprecated on '2025-09-01'. Creation was disabled on '2027-02-01' and update on '2027-03-03'. Please consider updating to 'nodejs24.x' (CloudFormation Validate)
+       NatureGalleryCdkStack/UpdateViewsLambda/Resource (UpdateViewsLambdaA2D9BEA2) aws-cdk-lib.aws_lambda.CfnFunction
+       Acknowledge with 'CloudFormation-Validate::W2531'
+    
+    lib\nature-gallery-cdk-stack.ts:109:29
+    WARNING Runtime: Runtime 'nodejs18.x' was deprecated on '2025-09-01'. Creation was disabled on '2027-02-01' and update on '2027-03-03'. Please consider updating to 'nodejs24.x' (CloudFormation Validate)
+       NatureGalleryCdkStack/EditImageLambda/Resource (EditImageLambdaF3A2E004) aws-cdk-lib.aws_lambda.CfnFunction
+       Acknowledge with 'CloudFormation-Validate::W2531'
+    
+    A copy of this report can be found in: ..\..\..\..\AppData\Local\Temp\cdk.outPxrMyQ\validation-report.json
+
+    [0m [90m  8 |[39m   [36mconst[39m app [33m=[39m [36mnew[39m cdk[33m.[39m[33mApp[39m()[33m;[39m
+     [90m  9 |[39m   [36mconst[39m stack [33m=[39m [36mnew[39m [33mNatureGalleryCdk[39m[33m.[39m[33mNatureGalleryCdkStack[39m(app[33m,[39m [32m'NatureGalleryCdkStack'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 10 |[39m   template [33m=[39m [33mTemplate[39m[33m.[39mfromStack(stack)[33m;[39m
+     [90m    |[39m                       [31m[1m^[22m[39m
+     [90m 11 |[39m })[33m;[39m
+     [90m 12 |[39m
+     [90m 13 |[39m test([32m'S3 bucket for static hosting is created'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at validateTemplates (node_modules/aws-cdk-lib/core/lib/private/synthesis-validation.js:6:173)
+      at synthesize (node_modules/aws-cdk-lib/core/lib/private/synthesis.js:1:3027)
+      at App.synth (node_modules/aws-cdk-lib/core/lib/stage.js:1:4999)
+      at App.synth (node_modules/aws-cdk-lib/core/lib/app.js:1:4988)
+      at toTemplate (node_modules/aws-cdk-lib/assertions/lib/template.js:2:247)
+      at Template.fromStack (node_modules/aws-cdk-lib/assertions/lib/template.js:1:2619)
+      at Object.fromStack (test/nature-gallery-cdk.test.ts:10:23)
+
+FAIL test/nature-gallery-cdk.test.ts (26.082 s)
+  √ S3 bucket for static hosting is created (8 ms)
+  √ CloudFront distribution is created with index.html as root object (1 ms)
+  √ DynamoDB table has category partition key and id sort key (1 ms)
+  × all six Lambda functions are created (2 ms)
+  × API Gateway exposes the expected routes (1 ms)
+  × Lambdas receive the table name environment variable (6 ms)
+
+  ● all six Lambda functions are created
+
+    Expected value   undefined
+    Received:
+      undefined
+
+    Message:
+      Expected 6 resources of type AWS::Lambda::Function but found 8
+
+    Difference:
+
+    Compared values have no visual difference.
+
+    [0m [90m 46 |[39m
+     [90m 47 |[39m test([32m'all six Lambda functions are created'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 48 |[39m   
+template[33m.[39mresourcePropertiesCountIs([32m'AWS::Lambda::Function'[39m[33m,[39m {}[33m,[39m 
+[35m6[39m)[33m;[39m
+     [90m    |[39m            [31m[1m^[22m[39m
+     [90m 49 |[39m })[33m;[39m
+     [90m 50 |[39m
+     [90m 51 |[39m test([32m'API Gateway exposes the expected routes'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Template.resourcePropertiesCountIs (node_modules/aws-cdk-lib/assertions/lib/template.js:1:3946)
+      at Object.resourcePropertiesCountIs (test/nature-gallery-cdk.test.ts:48:12)
+
+  ● API Gateway exposes the expected routes
+
+    Expected value   undefined
+    Received:
+      undefined
+
+    Message:
+      Expected 7 resources of type AWS::ApiGateway::Method but found 12
+
+    Difference:
+
+    Compared values have no visual difference.
+
+    [0m [90m 54 |[39m   })[33m;[39m
+     [90m 55 |[39m   [90m// GET {category}, POST images, DELETE {id}, PUT like, PUT view, PUT image, OPTIONS 
+(cors)[39m
+    [31m[1m>[22m[39m[90m 56 |[39m   
+template[33m.[39mresourcePropertiesCountIs([32m'AWS::ApiGateway::Method'[39m[33m,[39m {}[33m,[39m 
+[35m7[39m)[33m;[39m
+     [90m    |[39m            [31m[1m^[22m[39m
+     [90m 57 |[39m })[33m;[39m
+     [90m 58 |[39m
+     [90m 59 |[39m test([32m'Lambdas receive the table name environment variable'[39m[33m,[39m () [33m=>[39m 
+{[0m
+
+      at Template.resourcePropertiesCountIs (node_modules/aws-cdk-lib/assertions/lib/template.js:1:3946)
+      at Object.resourcePropertiesCountIs (test/nature-gallery-cdk.test.ts:56:12)
+
+  ● Lambdas receive the table name environment variable
+
+    Expected value   undefined
+    Received:
+      undefined
+
+    Message:
+      Template has 8 resources with type AWS::Lambda::Function, but none match as expected.
+    The 3 closest matches:
+    AddImageLambda25C1D740 :: {
+      "DependsOn": [ "AddImageLambdaServiceRoleDefaultPolicy154FD412", "AddImageLambdaServiceRole43FA8C42" ],
+      "Properties": {
+        "Architectures": [ "arm64" ],
+        "Code": { ... },
+        "Environment": {
+          "Variables": {
+            "BUCKET_NAME": { "Ref": "NatureGalleryBucket60F3604C" },
+            "CLOUDFRONT_DOMAIN": { "Fn::GetAtt": [ "NatureGalleryDistribution00F2B4D5", "DomainName" ] },
+            "TABLE_NAME": {
+    !!         Expected ImagesTable but received ImagesTable39278AD9
+              "Ref": "ImagesTable39278AD9"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": { "Fn::GetAtt": [ "AddImageLambdaServiceRole43FA8C42", "Arn" ] },
+        "Runtime": "nodejs18.x"
+      },
+      "Type": "AWS::Lambda::Function"
+    }
+    CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536 :: {
+      "DependsOn": [ "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF", 
+"CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265" ],
+      "Properties": {
+        "Code": { ... },
+        "Environment": {
+          "Variables": {
+            "AWS_CA_BUNDLE": "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+    !!       Missing key 'TABLE_NAME'
+            "TABLE_NAME": undefined
+          }
+        },
+        "Handler": "index.handler",
+        "Layers": [ { "Ref": "DeployWebsiteAwsCliLayer17DBC421" } ],
+        "Role": { "Fn::GetAtt": [ "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265", 
+"Arn" ] },
+        "Runtime": "python3.13",
+        "Timeout": 900
+      },
+      "Type": "AWS::Lambda::Function"
+    }
+    CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F :: {
+      "DependsOn": [ "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092" ],
+      "Properties": {
+        "Code": { ... },
+        "Description": { "Fn::Join": [ ... ] },
+    !!   Missing key 'Environment'
+        "Environment": undefined,
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": { "Fn::GetAtt": [ "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092", "Arn" ] },
+        "Runtime": "nodejs24.x",
+        "Timeout": 900
+      },
+      "Type": "AWS::Lambda::Function"
+    }
+
+    Difference:
+
+    Compared values have no visual difference.
+
+    [0m [90m 58 |[39m
+     [90m 59 |[39m test([32m'Lambdas receive the table name environment variable'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 60 |[39m   
+template[33m.[39mhasResourceProperties([32m'AWS::Lambda::Function'[39m[33m,[39m {
+     [90m    |[39m            [31m[1m^[22m[39m
+     [90m 61 |[39m     [33mEnvironment[39m[33m:[39m {
+     [90m 62 |[39m       [33mVariables[39m[33m:[39m {
+     [90m 63 |[39m         [33mTABLE_NAME[39m[33m:[39m { [33mRef[39m[33m:[39m [32m'ImagesTable'[39m 
+}[33m,[39m[0m
+
+      at Template.hasResourceProperties (node_modules/aws-cdk-lib/assertions/lib/template.js:1:4181)
+      at Object.hasResourceProperties (test/nature-gallery-cdk.test.ts:60:12)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 passed, 6 total
+Snapshots:   0 total
+Time:        26.196 s, estimated 33 s
+Ran all test suites.
