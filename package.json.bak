@@ -5,8 +5,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk",
-    "auth:start": "tsx \"Authentication folder/app.ts\""
+    "cdk": "cdk"
   },
   "devDependencies": {
     "@swc/core": "^1.15.0",
@@ -23,7 +22,20 @@
     "@aws-sdk/client-s3": "^3.1118.0",
     "@aws-sdk/lib-dynamodb": "^3.1117.0",
     "aws-cdk-lib": "^2.265.0",
-    "constructs": "^10.5.0",
+    "constructs": "^10.5.0"
+  }
+}
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
     "ejs": "^3.1.10",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
